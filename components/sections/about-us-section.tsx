@@ -19,7 +19,7 @@ export function AboutUsSection() {
       >
         <div className="relative w-full max-w-sm aspect-[4/3] rounded-2xl shadow-xl border-l-4 border-brand-blue overflow-hidden">
           <Image
-            src="/images/gallery/gallery1.jpeg"
+            src="/images/team.jpeg"
             alt="NH Services team"
             fill
             sizes="(max-width: 640px) 100vw, 45vw"

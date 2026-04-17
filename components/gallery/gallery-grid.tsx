@@ -11,78 +11,52 @@ import {
   Button,
 } from "@heroui/react";
 
-const imageArray: string[] = [
-  "/images/gallery/gallery1.jpeg",
-  "/images/gallery/gallery2.jpeg",
-  "/images/gallery/gallery3.jpg",
-  "/images/gallery/gallery4.jpg",
-  "/images/gallery/gallery5.jpg",
-  "/images/gallery/gallery6.jpg",
-  "/images/gallery/gallery7.jpg",
-  "/images/gallery/gallery8.jpg",
-  "/images/gallery/gallery9.jpg",
-  "/images/gallery/gallery10.jpg",
-  "/images/gallery/gallery11.jpg",
-  "/images/gallery/gallery12.jpg",
-  "/images/gallery/gallery13.jpg",
-  "/images/gallery/gallery14.jpg",
-  "/images/gallery/gallery15.jpg",
-  "/images/gallery/gallery16.jpg",
-  "/images/gallery/gallery17.jpg",
-  "/images/gallery/gallery18.jpg",
-  "/images/gallery/gallery19.jpg",
-  "/images/gallery/gallery20.jpg",
-  "/images/gallery/gallery21.jpg",
-  "/images/gallery/IMG_5627.jpeg",
-  "/images/gallery/IMG_5665.jpeg",
-  "/images/gallery/IMG_5786.jpeg",
-  "/images/gallery/IMG_5929.jpeg",
-  "/images/gallery/IMG_6101.jpeg",
-  "/images/gallery/IMG_6199.jpeg",
-  "/images/gallery/IMG_6201.jpeg",
-  "/images/gallery/IMG_6714.jpeg",
-  "/images/gallery/IMG_6737.jpeg",
-  "/images/gallery/IMG_6922.jpeg",
-  "/images/gallery/IMG_7071.jpeg",
-  "/images/gallery/IMG_7465.jpeg",
-  "/images/gallery/IMG_7467.jpeg",
-  "/images/gallery/IMG_7468.jpeg",
-  "/images/gallery/IMG_7469.jpeg",
-  "/images/gallery/IMG_7686.jpeg",
-];
+export type GalleryItem = {
+  id: string;
+  url: string;
+  alt: string;
+};
 
-export function GalleryGrid() {
+export function GalleryGrid({ images }: { images: GalleryItem[] }) {
   const [visibleImages, setVisibleImages] = useState(8);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selected, setSelected] = useState<GalleryItem | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const loadMoreImages = () =>
-    setVisibleImages((v) => Math.min(v + 8, imageArray.length));
+    setVisibleImages((v) => Math.min(v + 8, images.length));
 
-  const handleImageClick = (url: string) => {
-    setSelectedImage(url);
+  const openModal = (item: GalleryItem) => {
+    setSelected(item);
     setModalIsOpen(true);
   };
 
   const closeModal = () => {
-    setSelectedImage(null);
+    setSelected(null);
     setModalIsOpen(false);
   };
+
+  if (images.length === 0) {
+    return (
+      <p className="text-center text-gray-600 py-8">
+        Gallery is empty. Check back soon!
+      </p>
+    );
+  }
 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-gray-300 rounded-xl gap-4 justify-center p-2">
-        {imageArray.slice(0, visibleImages).map((url, index) => (
-          <div key={index} className="mb-4">
+        {images.slice(0, visibleImages).map((item, index) => (
+          <div key={item.id} className="mb-4">
             <button
               type="button"
-              onClick={() => handleImageClick(url)}
+              onClick={() => openModal(item)}
               className="cursor-pointer block w-full p-0 bg-transparent border-0"
             >
               <div className="relative aspect-[4/3]">
                 <Image
-                  src={url}
-                  alt={`Gallery ${index + 1}`}
+                  src={item.url}
+                  alt={item.alt}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover rounded-xl drop-shadow-xl p-2 transition-transform hover:scale-105"
@@ -93,7 +67,7 @@ export function GalleryGrid() {
           </div>
         ))}
       </div>
-      {visibleImages < imageArray.length && (
+      {visibleImages < images.length && (
         <div className="text-center my-4">
           <Button
             className="w-1/2 sm:w-1/4 text-white font-semibold h-12 shadow-lg text-lg bg-brand-gradient"
@@ -105,12 +79,14 @@ export function GalleryGrid() {
       )}
       <Modal isOpen={modalIsOpen} placement="center" onClose={closeModal}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Gallery Image</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            {selected?.alt ?? "Gallery Image"}
+          </ModalHeader>
           <ModalBody>
-            {selectedImage && (
+            {selected && (
               <Image
-                src={selectedImage}
-                alt="Gallery Image"
+                src={selected.url}
+                alt={selected.alt}
                 width={1600}
                 height={1200}
                 sizes="100vw"

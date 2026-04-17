@@ -26,6 +26,18 @@ export default async function AdminLayout({
           >
             Testimonials
           </Link>
+          <Link
+            href="/admin/gallery"
+            className="text-sm text-gray-600 hover:text-brand-dark-gray"
+          >
+            Gallery
+          </Link>
+          <Link
+            href="/admin/brochures"
+            className="text-sm text-gray-600 hover:text-brand-dark-gray"
+          >
+            Brochures
+          </Link>
         </div>
         <form
           action={async () => {

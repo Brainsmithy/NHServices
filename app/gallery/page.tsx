@@ -1,5 +1,8 @@
 import Image from "next/image";
-import { GalleryGrid } from "@/components/gallery/gallery-grid";
+import { unstable_cache } from "next/cache";
+import { GalleryGrid, type GalleryItem } from "@/components/gallery/gallery-grid";
+import { supabase } from "@/db";
+import { publicUrl } from "@/lib/storage";
 
 export const metadata = {
   title: "Gallery — NH Services",
@@ -7,7 +10,26 @@ export const metadata = {
     "Photos from NH Services HVAC installations and service calls across the Denver metro area.",
 };
 
-export default function GalleryPage() {
+const getGallery = unstable_cache(
+  async (): Promise<GalleryItem[]> => {
+    const { data, error } = await supabase
+      .from("gallery_images")
+      .select()
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((r) => ({
+      id: r.id,
+      url: publicUrl("gallery", r.storage_path),
+      alt: r.alt ?? r.filename,
+    }));
+  },
+  ["gallery:public"],
+  { tags: ["gallery"], revalidate: 300 },
+);
+
+export default async function GalleryPage() {
+  const images = await getGallery();
   return (
     <main className="min-h-screen flex flex-col">
       <div className="mb-4 mt-4 flex justify-center">
@@ -22,7 +44,7 @@ export default function GalleryPage() {
         />
       </div>
       <h1 className="text-center font-bold text-4xl mb-4">Gallery</h1>
-      <GalleryGrid />
+      <GalleryGrid images={images} />
     </main>
   );
 }

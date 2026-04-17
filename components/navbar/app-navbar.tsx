@@ -12,11 +12,17 @@ import {
   NavbarMenu,
   NavbarMenuItem,
 } from "@heroui/react";
-import EquipmentDropdown from "./equipment-dropdown";
+import EquipmentDropdown, {
+  type BrochureCategoryGroup,
+} from "./equipment-dropdown";
 
 const menuItems = ["About Us", "Services", "Testimonials", "Service Area"];
 
-export const AppNavbar = () => {
+export const AppNavbar = ({
+  brochureCategories,
+}: {
+  brochureCategories: BrochureCategoryGroup[];
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navbarRef = useRef<HTMLElement>(null);
 
@@ -52,7 +58,7 @@ export const AppNavbar = () => {
                 alt="NH Services"
                 width={140}
                 height={48}
-                style={{ height: "auto" }}
+                className="h-10 w-auto"
                 priority
               />
             </Link>
@@ -75,7 +81,7 @@ export const AppNavbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
-          <EquipmentDropdown />
+          <EquipmentDropdown categories={brochureCategories} />
           <Link
             href="/gallery"
             className="w-full text-lg nav-link"
@@ -98,7 +104,7 @@ export const AppNavbar = () => {
           </NavbarItem>
         ))}
         <NavbarItem>
-          <EquipmentDropdown />
+          <EquipmentDropdown categories={brochureCategories} />
         </NavbarItem>
         <NavbarItem>
           <Link href="/gallery" className="w-full text-md nav-link">

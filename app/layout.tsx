@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppNavbar } from "@/components/navbar/app-navbar";
+import type { BrochureCategoryGroup } from "@/components/navbar/equipment-dropdown";
 import { Footer } from "@/components/footer/footer";
+import { supabase } from "@/db";
+import { publicUrl } from "@/lib/storage";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -29,16 +33,43 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+const getBrochureCategories = unstable_cache(
+  async (): Promise<BrochureCategoryGroup[]> => {
+    const { data, error } = await supabase
+      .from("brochures")
+      .select()
+      .order("category", { ascending: true })
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    const grouped = new Map<string, BrochureCategoryGroup>();
+    for (const b of data ?? []) {
+      const existing = grouped.get(b.category);
+      const g: BrochureCategoryGroup =
+        existing ?? { name: b.category, brochures: [] };
+      g.brochures.push({
+        id: b.id,
+        title: b.title,
+        url: publicUrl("brochures", b.storage_path),
+      });
+      grouped.set(b.category, g);
+    }
+    return Array.from(grouped.values());
+  },
+  ["brochures:nav"],
+  { tags: ["brochures"], revalidate: 300 },
+);
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const brochureCategories = await getBrochureCategories();
   return (
     <html lang="en">
       <body>
         <Providers>
-          <AppNavbar />
+          <AppNavbar brochureCategories={brochureCategories} />
           {children}
           <Footer />
         </Providers>
