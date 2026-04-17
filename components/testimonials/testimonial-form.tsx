@@ -133,6 +133,8 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
   );
 }
 
+type SubmitStatus = "idle" | "submitting" | "success" | "error";
+
 export function TestimonialForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -140,6 +142,7 @@ export function TestimonialForm() {
   const [rating, setRating] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
@@ -163,23 +166,19 @@ export function TestimonialForm() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName || !lastName || !message || rating === 0) {
-      alert("All fields are required for submission!");
-      return;
-    }
+    if (rating === 0) return;
 
-    const newTestimonial = { firstName, lastName, message, rating };
+    setSubmitStatus("submitting");
 
     try {
       const response = await fetch("/api/testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newTestimonial),
+        body: JSON.stringify({ firstName, lastName, message, rating }),
       });
 
       if (response.ok) {
-        const data = (await response.json()) as Testimonial;
-        setTestimonials((prev) => [data, ...prev]);
+        setSubmitStatus("success");
         setFirstName("");
         setLastName("");
         setMessage("");
@@ -189,6 +188,7 @@ export function TestimonialForm() {
       }
     } catch (err) {
       console.error("[testimonials] submit failed", err);
+      setSubmitStatus("error");
     }
   };
 
@@ -249,6 +249,16 @@ export function TestimonialForm() {
           whileInView="visible"
           viewport={viewportConfig}
         >
+          {submitStatus === "success" && (
+            <div className="rounded-lg bg-green-50 text-green-800 px-3 py-2 text-sm mb-4">
+              Thanks! Your review is awaiting moderation.
+            </div>
+          )}
+          {submitStatus === "error" && (
+            <div className="rounded-lg bg-red-50 text-red-800 px-3 py-2 text-sm mb-4">
+              Could not submit. Please try again later.
+            </div>
+          )}
           <form
             className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8"
             onSubmit={handleFormSubmit}
@@ -265,6 +275,7 @@ export function TestimonialForm() {
                 label="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                isRequired
               />
               <Input
                 className="drop-shadow-sm"
@@ -274,6 +285,7 @@ export function TestimonialForm() {
                 label="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                isRequired
               />
             </div>
             <div className="mb-4">
@@ -286,6 +298,7 @@ export function TestimonialForm() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 maxLength={300}
+                isRequired
               />
             </div>
             <div className="flex items-center justify-center gap-2 mb-6">
