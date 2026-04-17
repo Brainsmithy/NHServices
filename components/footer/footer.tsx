@@ -18,7 +18,7 @@ const socialMediaLinks = [
   },
   {
     name: "Instagram",
-    url: "https://www.instagram.com/nh_services_llc",
+    url: "https://www.instagram.com/nh_services_hvac",
     icon: "/images/logos/instagram-icon.png",
   },
 ];
