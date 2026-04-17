@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { Button, Input } from "@heroui/react";
 import useEmblaCarousel from "embla-carousel-react";
@@ -8,7 +8,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { fadeInUp, viewportConfig } from "@/lib/animations";
 
 interface Testimonial {
-  _id: string;
+  id: string;
   firstName: string;
   lastName: string;
   message: string;
@@ -101,7 +101,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {testimonials.map((t) => (
-            <div className="flex-[0_0_100%] min-w-0 px-3 py-2" key={t._id}>
+            <div className="flex-[0_0_100%] min-w-0 px-3 py-2" key={t.id}>
               <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
                 <DisplayStars rating={t.rating} />
                 <p className="mt-4 text-gray-700 italic leading-relaxed text-base sm:text-lg">
@@ -140,25 +140,18 @@ export function TestimonialForm() {
   const [rating, setRating] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const warnedRef = useRef(false);
-
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch("/.netlify/functions/getTestimonials");
+        const response = await fetch("/api/testimonials");
         if (response.ok) {
           const data = (await response.json()) as Testimonial[];
           setTestimonials(data);
         } else {
           throw new Error("Failed to fetch testimonials");
         }
-      } catch {
-        if (!warnedRef.current) {
-          console.warn(
-            "[testimonials] getTestimonials unavailable in dev — wiring lands in Sprint 1.10"
-          );
-          warnedRef.current = true;
-        }
+      } catch (err) {
+        console.error("[testimonials] failed to load", err);
         setTestimonials([]);
       } finally {
         setIsLoading(false);
@@ -178,7 +171,7 @@ export function TestimonialForm() {
     const newTestimonial = { firstName, lastName, message, rating };
 
     try {
-      const response = await fetch("/.netlify/functions/addTestimonial", {
+      const response = await fetch("/api/testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTestimonial),
@@ -186,7 +179,7 @@ export function TestimonialForm() {
 
       if (response.ok) {
         const data = (await response.json()) as Testimonial;
-        setTestimonials((prev) => [...prev, data]);
+        setTestimonials((prev) => [data, ...prev]);
         setFirstName("");
         setLastName("");
         setMessage("");
@@ -194,10 +187,8 @@ export function TestimonialForm() {
       } else {
         throw new Error("Failed to add testimonial");
       }
-    } catch {
-      console.warn(
-        "[testimonials] addTestimonial unavailable in dev — wiring lands in Sprint 1.10"
-      );
+    } catch (err) {
+      console.error("[testimonials] submit failed", err);
     }
   };
 
