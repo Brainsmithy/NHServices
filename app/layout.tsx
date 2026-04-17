@@ -11,7 +11,7 @@ import { publicUrl } from "@/lib/storage";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://nhservicesllc.com",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://nhserviceshvac.com",
   ),
   title: {
     default: "NH Services — HVAC in Colorado",
