@@ -44,18 +44,20 @@ export const AppNavbar = () => {
       onMenuOpenChange={setIsMenuOpen}
     >
       <NavbarContent>
-        <NavbarBrand>
-          <Link href="/" className="nav-link">
-            <Image
-              src="/nhservices-logo-svg.svg"
-              alt="NH Services"
-              width={140}
-              height={48}
-              style={{ height: "auto" }}
-              priority
-            />
-          </Link>
-        </NavbarBrand>
+        <NavbarItem>
+          <NavbarBrand>
+            <Link href="/" className="nav-link">
+              <Image
+                src="/nhservices-logo-svg.svg"
+                alt="NH Services"
+                width={140}
+                height={48}
+                style={{ height: "auto" }}
+                priority
+              />
+            </Link>
+          </NavbarBrand>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarMenuToggle aria-label="Toggle menu" className="sm:hidden" />
@@ -95,10 +97,14 @@ export const AppNavbar = () => {
             </Link>
           </NavbarItem>
         ))}
-        <EquipmentDropdown />
-        <Link href="/gallery" className="w-full text-md nav-link">
-          Gallery
-        </Link>
+        <NavbarItem>
+          <EquipmentDropdown />
+        </NavbarItem>
+        <NavbarItem>
+          <Link href="/gallery" className="w-full text-md nav-link">
+            Gallery
+          </Link>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify="end" className="hidden md:flex">

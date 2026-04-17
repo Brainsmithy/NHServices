@@ -21,7 +21,7 @@ export default function GalleryPage() {
           priority
         />
       </div>
-      <h2 className="text-center font-bold text-4xl mb-4">Gallery</h2>
+      <h1 className="text-center font-bold text-4xl mb-4">Gallery</h1>
       <GalleryGrid />
     </main>
   );

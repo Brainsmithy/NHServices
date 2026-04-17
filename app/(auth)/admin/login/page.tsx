@@ -37,9 +37,6 @@ function LoginForm() {
       onSubmit={onSubmit}
       className="w-full max-w-sm space-y-4 bg-white p-8 rounded-2xl shadow-md border border-gray-100"
     >
-      <h1 className="text-2xl font-bold text-brand-dark-gray text-center">
-        Admin Sign-in
-      </h1>
       {error && (
         <div className="rounded-lg bg-red-50 text-red-800 px-3 py-2 text-sm">
           {error}
@@ -75,7 +72,10 @@ function LoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50">
+      <h1 className="text-2xl font-bold text-brand-dark-gray text-center mb-4">
+        Admin Sign-in
+      </h1>
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>

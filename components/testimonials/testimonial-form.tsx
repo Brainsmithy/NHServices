@@ -25,7 +25,13 @@ function StarRating({ value, onClick }: StarRatingProps) {
   return (
     <div className="flex space-x-2">
       {stars.map((star) => (
-        <button key={star} type="button" onClick={() => onClick(star)}>
+        <button
+          key={star}
+          type="button"
+          onClick={() => onClick(star)}
+          aria-label={`Rate ${star} out of 5`}
+          aria-pressed={star <= value}
+        >
           {star <= value ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
