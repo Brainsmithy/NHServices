@@ -1,25 +1,42 @@
-import "dotenv/config";
-import { db, schema } from "../db";
-import { eq } from "drizzle-orm";
+import { config as loadEnv } from "dotenv";
+loadEnv({ path: ".env.local" });
+loadEnv();
+
+import { supabase } from "../db";
 
 async function main() {
-  const [inserted] = await db
-    .insert(schema.testimonials)
-    .values({
-      firstName: "Smoke",
-      lastName: "Test",
+  const { data: inserted, error: insertErr } = await supabase
+    .from("testimonials")
+    .insert({
+      first_name: "Smoke",
+      last_name: "Test",
       message: "testing",
       rating: 5,
       approved: true,
     })
-    .returning();
+    .select()
+    .single();
+  if (insertErr) throw insertErr;
   console.log("Inserted:", inserted);
 
-  const rows = await db.select().from(schema.testimonials).where(eq(schema.testimonials.id, inserted.id));
+  const { data: rows, error: selErr } = await supabase
+    .from("testimonials")
+    .select()
+    .eq("id", inserted!.id);
+  if (selErr) throw selErr;
   console.log("Selected:", rows);
 
-  await db.delete(schema.testimonials).where(eq(schema.testimonials.id, inserted.id));
+  const { error: delErr } = await supabase
+    .from("testimonials")
+    .delete()
+    .eq("id", inserted!.id);
+  if (delErr) throw delErr;
   console.log("Deleted.");
 }
 
-main().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
+main()
+  .then(() => process.exit(0))
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });

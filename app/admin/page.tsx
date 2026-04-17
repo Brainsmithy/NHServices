@@ -1,5 +1,4 @@
-import { db, schema } from "@/db";
-import { eq, count } from "drizzle-orm";
+import { supabase } from "@/db";
 import { auth } from "@/auth";
 import Link from "next/link";
 
@@ -7,10 +6,12 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const session = await auth();
-  const [{ value: pending }] = await db
-    .select({ value: count() })
-    .from(schema.testimonials)
-    .where(eq(schema.testimonials.approved, false));
+  const { count, error } = await supabase
+    .from("testimonials")
+    .select("*", { count: "exact", head: true })
+    .eq("approved", false);
+  if (error) throw error;
+  const pending = count ?? 0;
 
   return (
     <div className="space-y-6">

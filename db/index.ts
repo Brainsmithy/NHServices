@@ -1,13 +1,15 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "./schema";
+import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.DATABASE_URL;
-if (!url) {
-  throw new Error("DATABASE_URL is not set");
-}
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const client = postgres(url, { prepare: false });
+if (!url) throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
+if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
 
-export const db = drizzle(client, { schema });
-export { schema };
+// Server-side client. Bypasses RLS via the service_role key.
+// NEVER import this from a client component.
+export const supabase = createClient(url, serviceRoleKey, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
+
+export type * from "./types";

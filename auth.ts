@@ -1,17 +1,11 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
-import { db, schema } from "@/db";
+import { supabase } from "@/db";
 
+// JWT session strategy — no DB adapter required for credentials-only auth.
+// The auth_* tables in db/schema.sql exist for a future OAuth provider.
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DrizzleAdapter(db, {
-    usersTable: schema.authUsers,
-    accountsTable: schema.accounts,
-    sessionsTable: schema.sessions,
-    verificationTokensTable: schema.verificationTokens,
-  }),
   session: { strategy: "jwt" },
   pages: { signIn: "/admin/login" },
   providers: [
@@ -21,17 +15,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(creds) {
-        const email = typeof creds?.email === "string" ? creds.email : undefined;
-        const password = typeof creds?.password === "string" ? creds.password : undefined;
+        const email =
+          typeof creds?.email === "string" ? creds.email : undefined;
+        const password =
+          typeof creds?.password === "string" ? creds.password : undefined;
         if (!email || !password) return null;
-        const [user] = await db
-          .select()
-          .from(schema.users)
-          .where(eq(schema.users.email, email.toLowerCase()))
-          .limit(1);
-        if (!user) return null;
-        const ok = await bcrypt.compare(password, user.passwordHash);
+
+        const { data: user, error } = await supabase
+          .from("users")
+          .select("id, email, password_hash, role")
+          .eq("email", email.toLowerCase())
+          .maybeSingle();
+        if (error || !user) return null;
+
+        const ok = await bcrypt.compare(password, user.password_hash);
         if (!ok) return null;
+
         return { id: user.id, email: user.email, role: user.role };
       },
     }),

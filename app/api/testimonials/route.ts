@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { desc, eq } from "drizzle-orm";
 import { revalidateTag, unstable_cache } from "next/cache";
 import { z } from "zod";
-import { db, schema } from "@/db";
+import { supabase } from "@/db";
+import type { Testimonial } from "@/db/types";
 import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -15,12 +15,15 @@ const InsertSchema = z.object({
 });
 
 const getApproved = unstable_cache(
-  async () =>
-    db
+  async (): Promise<Testimonial[]> => {
+    const { data, error } = await supabase
+      .from("testimonials")
       .select()
-      .from(schema.testimonials)
-      .where(eq(schema.testimonials.approved, true))
-      .orderBy(desc(schema.testimonials.createdAt)),
+      .eq("approved", true)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
   ["testimonials:approved"],
   { tags: ["testimonials"], revalidate: 60 },
 );
@@ -49,10 +52,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const [inserted] = await db
-    .insert(schema.testimonials)
-    .values({ ...parsed.data, approved: false })
-    .returning();
+  const { data: inserted, error } = await supabase
+    .from("testimonials")
+    .insert({
+      first_name: parsed.data.firstName,
+      last_name: parsed.data.lastName,
+      message: parsed.data.message,
+      rating: parsed.data.rating,
+      approved: false,
+    })
+    .select()
+    .single();
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   revalidateTag("testimonials", "default");
   return NextResponse.json(inserted, { status: 201 });

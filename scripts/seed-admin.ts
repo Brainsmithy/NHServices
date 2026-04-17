@@ -3,8 +3,7 @@ loadEnv({ path: ".env.local" });
 loadEnv();
 
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
-import { db, schema } from "../db";
+import { supabase } from "../db";
 
 const email = process.env.ADMIN_EMAIL?.toLowerCase();
 const password = process.env.ADMIN_PASSWORD;
@@ -16,24 +15,36 @@ if (!email || !password) {
 
 const hash = await bcrypt.hash(password, 10);
 
-const [existing] = await db
-  .select()
-  .from(schema.users)
-  .where(eq(schema.users.email, email))
-  .limit(1);
+const { data: existing, error: selErr } = await supabase
+  .from("users")
+  .select("id")
+  .eq("email", email)
+  .maybeSingle();
+if (selErr) {
+  console.error(selErr);
+  process.exit(1);
+}
 
 if (existing) {
-  await db
-    .update(schema.users)
-    .set({ passwordHash: hash, role: "admin" })
-    .where(eq(schema.users.id, existing.id));
+  const { error } = await supabase
+    .from("users")
+    .update({ password_hash: hash, role: "admin" })
+    .eq("id", existing.id);
+  if (error) {
+    console.error(error);
+    process.exit(1);
+  }
   console.log(`Updated admin: ${email}`);
 } else {
-  await db.insert(schema.users).values({
+  const { error } = await supabase.from("users").insert({
     email,
-    passwordHash: hash,
+    password_hash: hash,
     role: "admin",
   });
+  if (error) {
+    console.error(error);
+    process.exit(1);
+  }
   console.log(`Created admin: ${email}`);
 }
 

@@ -1,17 +1,17 @@
-import { db, schema } from "@/db";
-import { asc, desc } from "drizzle-orm";
+import { supabase } from "@/db";
+import type { Testimonial } from "@/db/types";
 import { TestimonialRowActions } from "@/components/admin/testimonial-row-actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTestimonials() {
-  const rows = await db
+  const { data, error } = await supabase
+    .from("testimonials")
     .select()
-    .from(schema.testimonials)
-    .orderBy(
-      asc(schema.testimonials.approved),
-      desc(schema.testimonials.createdAt),
-    );
+    .order("approved", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows: Testimonial[] = data ?? [];
 
   if (rows.length === 0) {
     return <p className="text-gray-600">No testimonials yet.</p>;
@@ -34,14 +34,14 @@ export default async function AdminTestimonials() {
           {rows.map((r) => (
             <tr key={r.id} className="border-t border-gray-100">
               <td className="px-4 py-2 whitespace-nowrap">
-                {new Date(r.createdAt).toLocaleDateString()}
+                {new Date(r.created_at).toLocaleDateString()}
               </td>
               <td className="px-4 py-2 whitespace-nowrap">
                 {"★".repeat(r.rating)}
                 {"☆".repeat(5 - r.rating)}
               </td>
               <td className="px-4 py-2 whitespace-nowrap">
-                {r.firstName} {r.lastName}
+                {r.first_name} {r.last_name}
               </td>
               <td className="px-4 py-2 max-w-md truncate">{r.message}</td>
               <td className="px-4 py-2">
