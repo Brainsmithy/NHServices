@@ -26,3 +26,20 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Next.js
+.next
+out
+*.tsbuildinfo
+
+# Local sprint planning & documentation (kept out of git history)
+/docs
+/sprints
+
+# Local SQLite databases (dev)
+*.sqlite
+*.sqlite-journal
+*.db
+local.db
+dev.db
+
