@@ -1,6 +1,8 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createId } from "@paralleldrive/cuid2";
 
+export { authUsers, accounts, sessions, verificationTokens } from "./auth-schema";
+
 export const testimonials = sqliteTable("testimonials", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   firstName: text("first_name").notNull(),
