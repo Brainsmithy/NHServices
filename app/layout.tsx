@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppNavbar } from "@/components/navbar/app-navbar";
+import { Footer } from "@/components/footer/footer";
 
 export const metadata: Metadata = {
   title: "NH Services — HVAC in Colorado",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <Providers>
           <AppNavbar />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

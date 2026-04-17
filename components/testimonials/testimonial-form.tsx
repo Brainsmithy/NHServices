@@ -1,0 +1,293 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { motion } from "motion/react";
+import { Button, Input } from "@heroui/react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { fadeInUp, viewportConfig } from "@/lib/animations";
+
+interface Testimonial {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  message: string;
+  rating: number;
+}
+
+interface StarRatingProps {
+  value: number;
+  onClick: (value: number) => void;
+}
+
+function StarRating({ value, onClick }: StarRatingProps) {
+  const stars = [1, 2, 3, 4, 5];
+  return (
+    <div className="flex space-x-2">
+      {stars.map((star) => (
+        <button key={star} type="button" onClick={() => onClick(star)}>
+          {star <= value ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-7 w-7 text-yellow-500 fill-current"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-7 w-7 text-gray-300"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function DisplayStars({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <svg
+          key={star}
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill={star <= rating ? "#FBBF24" : "#D1D5DB"}
+        >
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+export function TestimonialForm() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [message, setMessage] = useState("");
+  const [rating, setRating] = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const warnedRef = useRef(false);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/getTestimonials");
+        if (response.ok) {
+          const data = (await response.json()) as Testimonial[];
+          setTestimonials(data);
+        } else {
+          throw new Error("Failed to fetch testimonials");
+        }
+      } catch {
+        if (!warnedRef.current) {
+          console.warn(
+            "[testimonials] getTestimonials unavailable in dev — wiring lands in Sprint 1.10"
+          );
+          warnedRef.current = true;
+        }
+        setTestimonials([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firstName || !lastName || !message || rating === 0) {
+      alert("All fields are required for submission!");
+      return;
+    }
+
+    const newTestimonial = { firstName, lastName, message, rating };
+
+    try {
+      const response = await fetch("/.netlify/functions/addTestimonial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTestimonial),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as Testimonial;
+        setTestimonials((prev) => [...prev, data]);
+        setFirstName("");
+        setLastName("");
+        setMessage("");
+        setRating(0);
+      } else {
+        throw new Error("Failed to add testimonial");
+      }
+    } catch {
+      console.warn(
+        "[testimonials] addTestimonial unavailable in dev — wiring lands in Sprint 1.10"
+      );
+    }
+  };
+
+  const carouselSettings = {
+    dots: true,
+    infinite: testimonials.length > 1,
+    speed: 2000,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: testimonials.length > 1,
+    autoplaySpeed: 3000,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 1, slidesToScroll: 1, initialSlide: 0 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 1, slidesToScroll: 1, dots: false },
+      },
+    ],
+  };
+
+  const renderTestimonials = () => {
+    if (isLoading) {
+      return (
+        <div className="text-center text-brand-dark-gray text-lg font-semibold py-8">
+          Loading reviews...
+        </div>
+      );
+    }
+
+    if (testimonials.length === 0) {
+      return (
+        <div className="text-center py-8 px-4">
+          <p className="text-brand-dark-gray font-semibold text-lg">
+            No reviews yet &mdash; be the first!
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <Slider {...carouselSettings}>
+        {testimonials.map((testimonial) => (
+          <div key={testimonial._id} className="px-3 py-2">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
+              <DisplayStars rating={testimonial.rating} />
+              <p className="mt-4 text-gray-700 italic leading-relaxed text-base sm:text-lg">
+                &ldquo;{testimonial.message}&rdquo;
+              </p>
+              <p className="mt-4 font-bold text-brand-dark-gray">
+                &mdash; {testimonial.firstName} {testimonial.lastName}
+              </p>
+            </div>
+          </div>
+        ))}
+      </Slider>
+    );
+  };
+
+  return (
+    <section
+      id="testimonials"
+      className="bg-brand-light-gray text-brand-dark-gray py-12 px-6 sm:px-10 md:px-16 lg:px-24"
+    >
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          className="text-center mb-10"
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark-gray">
+            What Our Customers Say
+          </h2>
+          <div className="h-[3px] w-32 mx-auto bg-brand-gradient mt-3 rounded-full" />
+        </motion.div>
+
+        <motion.div
+          className="mb-12"
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
+          {renderTestimonials()}
+        </motion.div>
+
+        <motion.div
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportConfig}
+        >
+          <form
+            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8"
+            onSubmit={handleFormSubmit}
+          >
+            <h3 className="text-xl font-bold text-brand-dark-gray text-center mb-6">
+              Leave Us a Review!
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <Input
+                className="drop-shadow-sm"
+                fullWidth
+                color="primary"
+                size="sm"
+                label="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+              <Input
+                className="drop-shadow-sm"
+                fullWidth
+                color="primary"
+                size="sm"
+                label="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+            <div className="mb-4">
+              <Input
+                className="drop-shadow-sm"
+                fullWidth
+                color="primary"
+                size="lg"
+                label="Message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                maxLength={300}
+              />
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <label className="text-brand-dark-gray font-semibold">
+                Rate Us:
+              </label>
+              <StarRating value={rating} onClick={setRating} />
+            </div>
+            <Button
+              className="w-full h-12 drop-shadow-lg text-md text-white font-semibold bg-brand-gradient"
+              type="submit"
+              color="primary"
+            >
+              Submit Review
+            </Button>
+          </form>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
