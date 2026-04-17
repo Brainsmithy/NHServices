@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import { motion } from "motion/react";
 import { fadeInUp, scaleIn } from "@/lib/animations";
+import { ContactFormModal } from "@/components/contact/contact-form-modal";
 
 export function Hero() {
   return (
@@ -66,17 +67,10 @@ export function Hero() {
           animate="visible"
           transition={{ delay: 0.5 }}
         >
-          <Button
-            size="lg"
-            onPress={() =>
-              console.log(
-                "[hero] contact modal wiring lands in sprint 1.6"
-              )
-            }
-            className="h-12 px-6 text-white font-semibold text-md drop-shadow-lg bg-brand-gradient"
-          >
-            Get An Estimate!
-          </Button>
+          <ContactFormModal
+            buttonText="Get An Estimate!"
+            buttonClassName="h-12 px-6 text-white font-semibold text-md drop-shadow-lg bg-brand-gradient"
+          />
 
           <Button
             as="a"

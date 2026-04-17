@@ -17,6 +17,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,css,json}\""
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@heroui/react": "^2.8.10",
     "@react-pdf/renderer": "^3.3.8",
     "@tailwindcss/postcss": "^4.2.2",
