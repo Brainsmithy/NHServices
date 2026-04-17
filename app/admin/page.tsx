@@ -1,15 +1,34 @@
+import { db, schema } from "@/db";
+import { eq, count } from "drizzle-orm";
 import { auth } from "@/auth";
+import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const session = await auth();
+  const [{ value: pending }] = await db
+    .select({ value: count() })
+    .from(schema.testimonials)
+    .where(eq(schema.testimonials.approved, false));
+
   return (
-    <div>
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold text-brand-dark-gray">
         Welcome, {session?.user?.email}
       </h1>
-      <p className="mt-2 text-gray-600">
-        Sprint 1.12 lands the testimonial approval UI here.
-      </p>
+      <Link
+        href="/admin/testimonials"
+        className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition"
+      >
+        <div className="text-sm text-gray-500">Testimonials</div>
+        <div className="text-3xl font-bold text-brand-dark-gray mt-1">
+          {pending}{" "}
+          <span className="text-base font-normal text-gray-500">
+            pending approval
+          </span>
+        </div>
+      </Link>
     </div>
   );
 }
