@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
 import { Button, Input } from "@heroui/react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { fadeInUp, viewportConfig } from "@/lib/animations";
 
 interface Testimonial {
@@ -67,6 +66,69 @@ function DisplayStars({ rating }: { rating: number }) {
           <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
         </svg>
       ))}
+    </div>
+  );
+}
+
+function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const hasMany = testimonials.length > 1;
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: hasMany, align: "start" },
+    hasMany ? [Autoplay({ delay: 3000, stopOnInteraction: false })] : []
+  );
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    // Sync initial scroll snap from Embla once mounted — standard Embla init pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    onSelect();
+  }, [emblaApi, onSelect]);
+
+  const scrollTo = useCallback(
+    (i: number) => emblaApi && emblaApi.scrollTo(i),
+    [emblaApi]
+  );
+
+  return (
+    <div>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {testimonials.map((t) => (
+            <div className="flex-[0_0_100%] min-w-0 px-3 py-2" key={t._id}>
+              <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
+                <DisplayStars rating={t.rating} />
+                <p className="mt-4 text-gray-700 italic leading-relaxed text-base sm:text-lg">
+                  &ldquo;{t.message}&rdquo;
+                </p>
+                <p className="mt-4 font-bold text-brand-dark-gray">
+                  &mdash; {t.firstName} {t.lastName}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {hasMany && (
+        <div className="flex justify-center gap-2 mt-4">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollTo(i)}
+              className={`h-2 w-2 rounded-full transition-colors ${
+                i === selectedIndex ? "bg-brand-dark-gray" : "bg-gray-300"
+              }`}
+              aria-label={`Go to testimonial ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -139,27 +201,6 @@ export function TestimonialForm() {
     }
   };
 
-  const carouselSettings = {
-    dots: true,
-    infinite: testimonials.length > 1,
-    speed: 2000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: testimonials.length > 1,
-    autoplaySpeed: 3000,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 1, slidesToScroll: 1 } },
-      {
-        breakpoint: 768,
-        settings: { slidesToShow: 1, slidesToScroll: 1, initialSlide: 0 },
-      },
-      {
-        breakpoint: 480,
-        settings: { slidesToShow: 1, slidesToScroll: 1, dots: false },
-      },
-    ],
-  };
-
   const renderTestimonials = () => {
     if (isLoading) {
       return (
@@ -179,23 +220,7 @@ export function TestimonialForm() {
       );
     }
 
-    return (
-      <Slider {...carouselSettings}>
-        {testimonials.map((testimonial) => (
-          <div key={testimonial._id} className="px-3 py-2">
-            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
-              <DisplayStars rating={testimonial.rating} />
-              <p className="mt-4 text-gray-700 italic leading-relaxed text-base sm:text-lg">
-                &ldquo;{testimonial.message}&rdquo;
-              </p>
-              <p className="mt-4 font-bold text-brand-dark-gray">
-                &mdash; {testimonial.firstName} {testimonial.lastName}
-              </p>
-            </div>
-          </div>
-        ))}
-      </Slider>
-    );
+    return <TestimonialsCarousel testimonials={testimonials} />;
   };
 
   return (
