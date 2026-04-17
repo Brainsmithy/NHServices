@@ -40,15 +40,6 @@ const serviceItems = [
       </ul>
     ),
   },
-  {
-    title: "Swamp Cooler Services",
-    content: (
-      <ul className="list-disc ml-4 text-brand-dark-gray">
-        <li>Swamp Cooler Installation and Repairs</li>
-        <li>Swamp Cooler Start Ups and Winterizing</li>
-      </ul>
-    ),
-  },
 ];
 
 export function ServiceAccordion() {

@@ -54,10 +54,10 @@ export const AppNavbar = ({
           <NavbarBrand>
             <Link href="/" className="nav-link">
               <Image
-                src="/nhservices-logo-svg.svg"
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/brand/nh-logo.png`}
                 alt="NH Services"
-                width={140}
-                height={48}
+                width={577}
+                height={433}
                 className="h-10 w-auto"
                 priority
               />
