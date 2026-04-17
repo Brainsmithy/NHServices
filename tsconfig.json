@@ -44,14 +44,6 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    ".next",
-    "src",
-    "netlify",
-    "vite.config.ts",
-    "vite.config.d.ts",
-    "tailwind.config.js",
-    "postcss.config.js",
-    ".eslintrc.cjs.vite-backup"
+    ".next"
   ]
 }
