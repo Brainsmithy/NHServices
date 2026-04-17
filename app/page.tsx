@@ -4,6 +4,7 @@ import { AboutUsSection } from "@/components/sections/about-us-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { TestimonialForm } from "@/components/testimonials/testimonial-form";
 import { ServiceAreaSection } from "@/components/sections/service-area-section";
+import { FAQAccordion } from "@/components/accordions/faq-accordion";
 
 export default function HomePage() {
   return (
@@ -19,12 +20,9 @@ export default function HomePage() {
       <div className="section-divider" />
       <ServiceAreaSection />
       <div className="section-divider" />
-      <div
-        id="faq"
-        className="bg-white py-12 text-center text-sm text-brand-dark-gray"
-      >
-        TODO: FAQ accordion lands in Sprint 1.5
-      </div>
+      <section id="faq" className="py-12 px-4 max-w-3xl mx-auto w-full">
+        <FAQAccordion />
+      </section>
       <div className="section-divider" />
     </main>
   );

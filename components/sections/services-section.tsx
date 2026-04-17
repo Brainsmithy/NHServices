@@ -8,6 +8,7 @@ import {
   staggerItem,
   viewportConfig,
 } from "@/lib/animations";
+import { ServiceAccordion } from "@/components/accordions/service-accordion";
 
 const brandLogos = [
   {
@@ -45,9 +46,7 @@ export function ServicesSection() {
           viewport={viewportConfig}
           style={{ overflow: "visible" }}
         >
-          <div className="rounded-2xl border border-dashed border-gray-300 p-10 text-center text-brand-dark-gray">
-            TODO: services accordion lands in Sprint 1.5
-          </div>
+          <ServiceAccordion />
         </motion.div>
 
         <div className="w-full lg:w-1/2">
