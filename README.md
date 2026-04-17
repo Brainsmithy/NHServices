@@ -5,8 +5,8 @@ Marketing + lead-capture site for NH Services, a family-run HVAC business in the
 ## Tech stack
 
 - **Next.js 16** (App Router, Turbopack) + React 19
-- **Auth.js v5** — Credentials provider, JWT sessions, admin gate via `proxy.ts`
-- **Drizzle ORM** + `@libsql/client` — local SQLite in dev (`file:./local.db`); Supabase Postgres planned for production (see `docs/BACKLOG.md`)
+- **Supabase** — Postgres + Storage. App talks to it via `@supabase/supabase-js` with the `service_role` key server-side.
+- **Auth.js v5** — Credentials provider + JWT sessions. Admin-only routes gated by `proxy.ts`; Server Actions re-check `assertAdmin()`.
 - **HeroUI** + **Tailwind CSS v4**
 - **Motion** (`motion/react`) + **Embla Carousel**
 - **@emailjs/browser** — client-side contact form
@@ -22,33 +22,44 @@ npm run start          # run the built app on port 4700
 npm run lint           # eslint
 npm run format         # prettier write
 
-npm run db:migrate     # apply drizzle migrations to local.db
-npm run db:generate    # generate a new migration after editing db/schema.ts
-npm run db:studio      # drizzle studio
-npm run db:smoke       # roundtrip smoke test against testimonials
-npm run db:seed-admin  # hash ADMIN_PASSWORD from env and upsert the admin row
+npm run db:smoke       # Supabase insert/read/delete roundtrip
+npm run db:seed-admin  # bcrypt-hash ADMIN_PASSWORD and upsert the admin row
 ```
 
 ## Env vars
 
-See `.env.example` for the full list. Minimum to boot:
+See `.env.example`. Minimum to boot:
 
-- `DATABASE_URL=file:./local.db` (default)
+- `NEXT_PUBLIC_SUPABASE_URL` — project URL (e.g. `https://abc123.supabase.co`)
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only. **Never** prefix with `NEXT_PUBLIC_`.
 - `AUTH_SECRET` — `openssl rand -base64 32`
-- `AUTH_URL=http://localhost:4700`
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD` (for the seeder)
-- `NEXT_PUBLIC_EMAILJS_*` (contact form)
-- `NEXT_PUBLIC_SITE_URL` (drives sitemap/robots/OG)
+- `AUTH_URL=http://localhost:4700` (local) / production URL on Vercel
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD` (one-time for the seeder; remove from Vercel after seeding)
+- `NEXT_PUBLIC_EMAILJS_SERVICE_ID` / `_TEMPLATE_ID` / `_PUBLIC_KEY` (contact form)
+- `NEXT_PUBLIC_SITE_URL` (drives sitemap, robots, OG metadataBase)
 
-## Seed the admin user
+## First-time setup
 
-```bash
-cp .env.example .env.local   # fill in AUTH_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
-npm run db:migrate
-npm run db:seed-admin
-```
+1. Create a Supabase project at https://supabase.com.
+2. Copy `.env.example` to `.env.local` and fill in values.
+3. Open Supabase Dashboard → SQL Editor → New query. Paste `db/schema.sql` and run it. Creates 8 tables + 2 storage buckets (`gallery`, `brochures`) + RLS policies.
+4. Seed the admin user:
+   ```bash
+   npm run db:seed-admin
+   ```
+5. Start dev:
+   ```bash
+   npm run dev
+   ```
+   Log in at `http://localhost:4700/admin/login`.
 
-Then log in at `http://localhost:4700/admin/login`.
+## Admin surface
+
+Once logged in at `/admin`, you have:
+
+- **Testimonials** — `/admin/testimonials`: approve / unapprove / delete public submissions.
+- **Gallery** — `/admin/gallery`: drag-and-drop image uploads; edit alt text; delete. Changes reflect on public `/gallery` immediately (cache tag invalidation).
+- **Brochures** — `/admin/brochures`: drag-and-drop PDF uploads with title + category. Powers the Equipment dropdown in the navbar.
 
 ## Docs
 
@@ -59,6 +70,5 @@ Internal docs live in `/docs` (gitignored):
 - `CLIENT_RUNBOOK.md` — non-developer admin guide
 - `BACKLOG.md` — post-launch follow-ups
 - `LAUNCH_REPORT.md` — what shipped + known limitations
-- `MIGRATION_MAP.md`, `SPRINT_PLAN.md`, `TECH_STACK.md`, `STYLE_GUIDE.md`
 
-Sprint specs live in `/sprints` (tracked).
+Sprint specs live in `/sprints` (gitignored).
