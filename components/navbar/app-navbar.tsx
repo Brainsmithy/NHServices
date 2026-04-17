@@ -20,8 +20,10 @@ const menuItems = ["About Us", "Services", "Testimonials", "Service Area"];
 
 export const AppNavbar = ({
   brochureCategories,
+  logoUrl,
 }: {
   brochureCategories: BrochureCategoryGroup[];
+  logoUrl: string;
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navbarRef = useRef<HTMLElement>(null);
@@ -54,7 +56,7 @@ export const AppNavbar = ({
           <NavbarBrand>
             <Link href="/" className="nav-link">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/brand/nh-logo.png`}
+                src={logoUrl}
                 alt="NH Services"
                 width={577}
                 height={433}

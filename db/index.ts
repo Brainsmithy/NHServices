@@ -1,15 +1,38 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Lazy client — does NOT fail at module load if env vars are missing.
+// Fails only when a Supabase method is actually called. This lets the
+// Vercel build collect page data before env vars are set, and lets
+// routes that short-circuit on missing env (see isSupabaseConfigured)
+// skip network work entirely.
+let _client: SupabaseClient | null = null;
 
-if (!url) throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
-if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+function makeClient(): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Supabase env missing: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
+    );
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
 
-// Server-side client. Bypasses RLS via the service_role key.
-// NEVER import this from a client component.
-export const supabase = createClient(url, serviceRoleKey, {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    if (!_client) _client = makeClient();
+    const value = Reflect.get(_client, prop, _client);
+    return typeof value === "function" ? value.bind(_client) : value;
+  },
+}) as SupabaseClient;
+
+export function isSupabaseConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+}
 
 export type * from "./types";

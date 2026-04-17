@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 import { AppNavbar } from "@/components/navbar/app-navbar";
 import type { BrochureCategoryGroup } from "@/components/navbar/equipment-dropdown";
 import { Footer } from "@/components/footer/footer";
-import { supabase } from "@/db";
+import { supabase, isSupabaseConfigured } from "@/db";
 import { publicUrl } from "@/lib/storage";
 
 export const metadata: Metadata = {
@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 
 const getBrochureCategories = unstable_cache(
   async (): Promise<BrochureCategoryGroup[]> => {
+    if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from("brochures")
       .select()
@@ -65,11 +66,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const brochureCategories = await getBrochureCategories();
+  const logoUrl = isSupabaseConfigured()
+    ? publicUrl("brand", "nh-logo.png")
+    : "/nhservices-logo-svg.svg";
   return (
     <html lang="en">
       <body>
         <Providers>
-          <AppNavbar brochureCategories={brochureCategories} />
+          <AppNavbar
+            brochureCategories={brochureCategories}
+            logoUrl={logoUrl}
+          />
           {children}
           <Footer />
         </Providers>

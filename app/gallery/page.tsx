@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { unstable_cache } from "next/cache";
 import { GalleryGrid, type GalleryItem } from "@/components/gallery/gallery-grid";
-import { supabase } from "@/db";
+import { supabase, isSupabaseConfigured } from "@/db";
 import { publicUrl } from "@/lib/storage";
 
 export const metadata = {
@@ -12,6 +12,7 @@ export const metadata = {
 
 const getGallery = unstable_cache(
   async (): Promise<GalleryItem[]> => {
+    if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from("gallery_images")
       .select()
