@@ -6,6 +6,7 @@ import { Button } from "@heroui/react";
 import { motion } from "motion/react";
 import { fadeInUp, scaleIn } from "@/lib/animations";
 import { ContactFormModal } from "@/components/contact/contact-form-modal";
+import { GoogleReviewsBadge } from "@/components/sections/google-reviews-badge";
 
 export function Hero() {
   return (
@@ -22,6 +23,8 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white/90" />
       </div>
 
+      <GoogleReviewsBadge />
+
       <div className="relative z-10 flex flex-col items-center justify-center py-16 sm:py-20 md:py-28 lg:py-32 px-6">
         <Link href="/" className="nav-link">
           <motion.div
@@ -30,15 +33,16 @@ export function Hero() {
             animate="visible"
             className="drop-shadow-lg"
           >
-            <Image
-              src="/images/logos/nhservices-logo.png"
-              alt="NH Services"
-              width={520}
-              height={520}
-              priority
-              style={{ width: "auto" }}
-              className="h-28 sm:h-36 md:h-44 lg:h-52"
-            />
+            <div className="relative h-28 w-28 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-52 lg:w-52">
+              <Image
+                src="/images/logos/nhservices-logo.png"
+                alt="NH Services"
+                fill
+                priority
+                sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, (max-width: 1024px) 176px, 208px"
+                className="object-contain"
+              />
+            </div>
           </motion.div>
         </Link>
 
@@ -61,7 +65,7 @@ export function Hero() {
         />
 
         <motion.div
-          className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4 sm:gap-6"
+          className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
           variants={fadeInUp}
           initial="hidden"
           animate="visible"
@@ -72,7 +76,7 @@ export function Hero() {
             buttonClassName="h-12 px-6 rounded-lg text-white font-semibold text-md drop-shadow-lg bg-brand-gradient"
           />
 
-          <div className="flex flex-col items-center">
+          <div className="relative">
             <Button
               as="a"
               href="https://www.synchrony.com/mmc/M9229374400"
@@ -82,9 +86,13 @@ export function Hero() {
             >
               Financing Available!
             </Button>
-            <span className="mt-1 text-xs text-brand-dark-gray/80">
-              by Synchrony
-            </span>
+            <Image
+              src="/images/logos/synchrony-logo.png"
+              alt="by Synchrony"
+              width={96}
+              height={24}
+              className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 h-5 w-auto opacity-90 pointer-events-none"
+            />
           </div>
         </motion.div>
       </div>

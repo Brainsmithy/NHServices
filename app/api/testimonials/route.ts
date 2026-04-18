@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag, unstable_cache } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { supabase } from "@/db";
-import type { Testimonial } from "@/db/types";
 import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const InsertSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -14,23 +14,16 @@ const InsertSchema = z.object({
   rating: z.number().int().min(1).max(5),
 });
 
-const getApproved = unstable_cache(
-  async (): Promise<Testimonial[]> => {
-    const { data, error } = await supabase
-      .from("testimonials")
-      .select()
-      .eq("approved", true)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data ?? [];
-  },
-  ["testimonials:approved"],
-  { tags: ["testimonials"], revalidate: 60 },
-);
-
 export async function GET() {
-  const rows = await getApproved();
-  return NextResponse.json(rows);
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select()
+    .eq("approved", true)
+    .order("created_at", { ascending: false });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data ?? []);
 }
 
 export async function POST(req: NextRequest) {

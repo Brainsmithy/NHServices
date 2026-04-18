@@ -1,16 +1,70 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Button } from "@heroui/react";
 
 type Props = {
   action: (formData: FormData) => Promise<void>;
   accept: string; // e.g. "image/jpeg,image/png,image/webp"
   maxSizeBytes: number;
   label: string; // shown in the drop zone
-  /** Optional extra form fields rendered below the drop zone (e.g. category). */
+  /** Optional extra form fields rendered inside the form (e.g. category). */
   children?: React.ReactNode;
 };
+
+function UploadIcon({ className = "h-10 w-10" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function FileIcon() {
+  return (
+    <svg
+      className="h-4 w-4 shrink-0 text-brand-blue"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      className="h-3.5 w-3.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
 
 export function MediaUploader({
   action,
@@ -27,6 +81,7 @@ export function MediaUploader({
   const [pending, startTransition] = useTransition();
 
   const acceptedTypes = accept.split(",").map((s) => s.trim());
+  const maxSizeMb = Math.round(maxSizeBytes / 1024 / 1024);
 
   function validate(files: File[]): string | null {
     for (const f of files) {
@@ -34,7 +89,7 @@ export function MediaUploader({
         return `"${f.name}" has an unsupported type (${f.type}).`;
       }
       if (f.size > maxSizeBytes) {
-        return `"${f.name}" is too large (${(f.size / 1024 / 1024).toFixed(1)}MB > ${(maxSizeBytes / 1024 / 1024).toFixed(0)}MB).`;
+        return `"${f.name}" is too large (${(f.size / 1024 / 1024).toFixed(1)}MB > ${maxSizeMb}MB).`;
       }
     }
     return null;
@@ -53,10 +108,13 @@ export function MediaUploader({
     setSelected(arr);
   }
 
+  function removeFile(index: number) {
+    setSelected((prev) => prev.filter((_, i) => i !== index));
+  }
+
   async function uploadOne(file: File) {
     const fd = new FormData();
     fd.append("file", file);
-    // Carry any sibling form fields (e.g. category, title) into the action
     if (formRef.current) {
       for (const [k, v] of new FormData(formRef.current).entries()) {
         if (k !== "file") fd.append(k, v);
@@ -79,13 +137,19 @@ export function MediaUploader({
     });
   }
 
+  const friendlyTypes = acceptedTypes
+    .map((t) => t.split("/")[1]?.toUpperCase())
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-lg border border-gray-200 bg-white p-4"
+      className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 space-y-5"
     >
-      <div
+      <button
+        type="button"
         onDragOver={(e) => {
           e.preventDefault();
           setDragOver(true);
@@ -97,16 +161,24 @@ export function MediaUploader({
           handleFiles(e.dataTransfer.files);
         }}
         onClick={() => fileInput.current?.click()}
-        className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition ${
+        className={`w-full rounded-xl border-2 border-dashed py-10 px-6 text-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
           dragOver
-            ? "border-brand-blue bg-blue-50"
-            : "border-gray-300 hover:border-gray-400"
+            ? "border-brand-blue bg-blue-50/60 scale-[1.01]"
+            : "border-gray-300 hover:border-brand-blue hover:bg-blue-50/30"
         }`}
       >
-        <p className="text-sm text-gray-600">
+        <div className={`inline-flex items-center justify-center h-14 w-14 rounded-full mb-3 ${
+          dragOver ? "bg-brand-blue text-white" : "bg-blue-50 text-brand-blue"
+        } transition-colors`}>
+          <UploadIcon />
+        </div>
+        <p className="text-base font-semibold text-brand-dark-gray">
           {selected.length > 0
-            ? `${selected.length} file(s) ready to upload`
-            : `Drop ${label} here, or click to pick files`}
+            ? `${selected.length} file${selected.length === 1 ? "" : "s"} ready to upload`
+            : `Drop ${label} here, or click to browse`}
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          {friendlyTypes} · up to {maxSizeMb}MB each
         </p>
         <input
           ref={fileInput}
@@ -117,49 +189,77 @@ export function MediaUploader({
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-      </div>
+      </button>
 
       {selected.length > 0 && (
-        <ul className="text-sm text-gray-600 space-y-1">
+        <ul className="space-y-2">
           {selected.map((f, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <span className="truncate">{f.name}</span>
-              <span className="text-xs text-gray-400">
+            <li
+              key={`${f.name}-${i}`}
+              className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+            >
+              <FileIcon />
+              <span className="flex-1 truncate text-sm text-brand-dark-gray font-medium">
+                {f.name}
+              </span>
+              <span className="text-xs text-gray-400 shrink-0">
                 {(f.size / 1024).toFixed(0)} KB
               </span>
+              {!pending && (
+                <button
+                  type="button"
+                  onClick={() => removeFile(i)}
+                  aria-label={`Remove ${f.name}`}
+                  className="p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <CloseIcon />
+                </button>
+              )}
             </li>
           ))}
         </ul>
       )}
 
-      {children}
+      {children && <div className="space-y-3">{children}</div>}
 
       {error && (
-        <p className="text-sm text-red-700 bg-red-50 rounded px-2 py-1">
+        <div className="rounded-lg border border-red-200 bg-red-50 text-red-800 text-sm px-3 py-2">
           {error}
-        </p>
+        </div>
       )}
 
-      <div className="flex gap-2">
-        <Button
+      <div className="flex flex-wrap items-center gap-2">
+        <button
           type="submit"
-          color="primary"
-          isDisabled={selected.length === 0 || pending}
-          isLoading={pending}
+          disabled={selected.length === 0 || pending}
+          className="inline-flex items-center gap-2 px-5 h-10 rounded-lg bg-brand-gradient text-white text-sm font-semibold shadow-sm hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2"
         >
-          Upload {selected.length > 0 ? `(${selected.length})` : ""}
-        </Button>
+          {pending ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+                <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+              Uploading…
+            </>
+          ) : (
+            <>
+              <UploadIcon className="h-4 w-4" />
+              <span>Upload{selected.length > 0 ? ` (${selected.length})` : ""}</span>
+            </>
+          )}
+        </button>
         {selected.length > 0 && !pending && (
-          <Button
+          <button
             type="button"
-            variant="flat"
-            onPress={() => {
+            onClick={() => {
               setSelected([]);
               if (fileInput.current) fileInput.current.value = "";
             }}
+            className="px-4 h-10 rounded-lg border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
             Clear
-          </Button>
+          </button>
         )}
       </div>
     </form>

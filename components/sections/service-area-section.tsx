@@ -4,12 +4,13 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import {
   fadeInLeft,
-  fadeInUp,
+  fadeInRight,
   scaleIn,
   staggerContainer,
   staggerItem,
   viewportConfig,
 } from "@/lib/animations";
+import { SectionHeader } from "./section-header";
 
 const cities = [
   "Longmont",
@@ -29,76 +30,113 @@ const cities = [
   "Castle Rock",
 ];
 
+function PinIcon() {
+  return (
+    <svg
+      className="h-3.5 w-3.5 text-brand-blue shrink-0"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
+    </svg>
+  );
+}
+
 export function ServiceAreaSection() {
   return (
-    <section id="servicearea">
-      <div className="flex flex-col sm:flex-row bg-white text-brand-dark-gray px-6 sm:px-10 md:px-16 lg:px-24 py-12 gap-8">
-        <div className="flex flex-col sm:w-1/2">
-          <div className="mb-2 text-center">
-            <h1 className="text-3xl font-bold mt-8 sm:mt-4">
-              Proudly Serving
-            </h1>
-            <div className="h-[2px] w-24 mx-auto bg-brand-gradient mt-2" />
-          </div>
-          <div className="w-full p-4 sm:gap-10 flex justify-center items-center">
-            <motion.div
-              variants={fadeInLeft}
-              initial="hidden"
-              whileInView="visible"
-              viewport={viewportConfig}
-              className="mr-8 sm:mr-0"
-            >
-              <Image
-                src="/images/longmont-to-castle-rock-map.png"
-                alt="Service map — Longmont to Castle Rock"
-                width={600}
-                height={800}
-                style={{ height: "auto", width: "auto" }}
-                className="max-h-80 sm:max-h-[28rem] drop-shadow-xl rounded-xl object-contain"
-              />
-            </motion.div>
-            <motion.ul
-              className="list-disc ml-4 sm:ml-8 text-brand-dark-gray"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={viewportConfig}
-            >
-              {cities.map((city) => (
-                <motion.li key={city} variants={staggerItem}>
-                  {city}
-                </motion.li>
-              ))}
-            </motion.ul>
-          </div>
-        </div>
+    <section
+      id="servicearea"
+      className="bg-gradient-to-b from-gray-50 via-white to-gray-50 text-brand-dark-gray py-20 px-6 sm:px-10 md:px-16 lg:px-20"
+    >
+      <div className="max-w-7xl mx-auto">
+        <SectionHeader
+          eyebrow="Where We Work"
+          title="Proudly Serving the Denver Metro"
+          description="From Longmont down to Castle Rock — if you're in the metro, we'll be there."
+        />
 
-        <div className="sm:mt-8 md:mt-12 sm:flex flex-col justify-center items-center sm:w-1/2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <motion.div
-            variants={scaleIn}
+            className="lg:col-span-7"
+            variants={fadeInLeft}
             initial="hidden"
             whileInView="visible"
             viewport={viewportConfig}
-            className="mx-auto"
           >
-            <Image
-              src="/images/logos/bbb-logo.png"
-              alt="BBB Accredited Business"
-              width={320}
-              height={320}
-              style={{ width: "auto" }}
-              className="h-48 sm:h-56 md:h-64 rounded-xl object-contain"
-            />
+            <div className="rounded-2xl bg-white border border-gray-200 shadow-md p-5 sm:p-7">
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-center">
+                <div className="relative w-full max-w-xs sm:w-56 mx-auto">
+                  <Image
+                    src="/images/longmont-to-castle-rock-map.png"
+                    alt="Service map — Longmont to Castle Rock"
+                    width={600}
+                    height={800}
+                    style={{ width: "auto", height: "auto" }}
+                    className="max-h-[22rem] mx-auto rounded-xl object-contain"
+                  />
+                </div>
+                <motion.ul
+                  className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:text-base"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportConfig}
+                >
+                  {cities.map((city) => (
+                    <motion.li
+                      key={city}
+                      variants={staggerItem}
+                      className="flex items-center gap-2 text-brand-dark-gray"
+                    >
+                      <PinIcon />
+                      <span>{city}</span>
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </div>
+            </div>
           </motion.div>
-          <motion.h2
-            className="text-3xl sm:w-3/4 text-red-600 font-bold text-center mt-8"
-            variants={fadeInUp}
+
+          <motion.div
+            className="lg:col-span-5"
+            variants={fadeInRight}
             initial="hidden"
             whileInView="visible"
             viewport={viewportConfig}
           >
-            Fully Licensed &amp; Insured in the State of Colorado!
-          </motion.h2>
+            <div className="rounded-2xl bg-white border border-gray-200 shadow-md p-7 sm:p-9 text-center">
+              <motion.div
+                variants={scaleIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportConfig}
+                className="flex justify-center"
+              >
+                <Image
+                  src="/images/logos/bbb-logo.png"
+                  alt="BBB Accredited Business"
+                  width={320}
+                  height={320}
+                  style={{ width: "auto" }}
+                  className="h-40 sm:h-48 md:h-56 rounded-xl object-contain"
+                />
+              </motion.div>
+
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-800 text-xs font-bold tracking-wide uppercase">
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+                Licensed &amp; Insured · Colorado
+              </div>
+
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-brand-dark-gray mt-5 leading-tight">
+                Fully Licensed &amp; Insured in the State of Colorado
+              </h3>
+              <p className="mt-3 text-sm text-gray-600">
+                Accredited by the Better Business Bureau — a small operation
+                you can trust with your home.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

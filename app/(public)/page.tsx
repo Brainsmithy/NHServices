@@ -1,4 +1,3 @@
-import { PaymentLogos } from "@/components/sections/payment-logos";
 import { Hero } from "@/components/sections/hero";
 import { AboutUsSection } from "@/components/sections/about-us-section";
 import { ServicesSection } from "@/components/sections/services-section";
@@ -10,20 +9,18 @@ export default function HomePage() {
   return (
     <main className="w-full">
       <Hero />
-      <div className="section-divider" />
       <AboutUsSection />
-      <div className="section-divider" />
       <ServicesSection />
-      <div className="section-divider" />
       <TestimonialForm />
-      <div className="section-divider" />
       <ServiceAreaSection />
-      <div className="section-divider" />
-      <section id="faq" className="py-12 px-4 max-w-3xl mx-auto w-full">
-        <FAQAccordion />
+      <section
+        id="faq"
+        className="bg-white py-20 px-6 sm:px-10 md:px-16 lg:px-20"
+      >
+        <div className="max-w-3xl mx-auto">
+          <FAQAccordion />
+        </div>
       </section>
-      <div className="section-divider" />
-      <PaymentLogos />
     </main>
   );
 }

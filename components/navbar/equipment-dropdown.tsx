@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useBrochures } from "@/lib/use-brochures";
 
 export type BrochureLink = {
   id: string;
@@ -17,7 +18,24 @@ type Props = {
   categories: BrochureCategoryGroup[];
 };
 
-const EquipmentDropdown = ({ categories }: Props) => {
+const ChevronDown = ({ className = "" }: { className?: string }) => (
+  <svg
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path
+      fillRule="evenodd"
+      d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+const EquipmentDropdown = ({ categories: initialCategories }: Props) => {
+  const { data: categories } = useBrochures(initialCategories);
   const [isOpen, setIsOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -44,75 +62,68 @@ const EquipmentDropdown = ({ categories }: Props) => {
   return (
     <div ref={dropdownRef} className="relative inline-block text-left">
       <button
-        className="inline-flex justify-center w-full rounded-md py-2 sm:text-md font-medium text-gray-500 cursor-pointer"
+        type="button"
+        className="inline-flex items-center justify-center rounded-md py-2 sm:text-md font-medium text-gray-500 cursor-pointer hover:text-brand-blue transition-colors"
         onClick={() => {
           setIsOpen((v) => !v);
           setOpenSubMenu(null);
         }}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         Equipment
-        <svg
-          className="-mr-1 ml-2 h-5 w-5"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path fillRule="evenodd" d="M5 10l5 5 5-5H5z" />
-        </svg>
+        <ChevronDown
+          className={`ml-1.5 h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
       {isOpen && (
-        <div className="sm:origin-top-right absolute mt-2 w-48 sm:w-56 max-w-[calc(100vw-2rem)] z-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-          <div
-            className="py-1"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="options-menu"
-          >
-            {categories.map((group) => (
-              <div key={group.name}>
-                <button
-                  onClick={() =>
-                    setOpenSubMenu(
-                      openSubMenu === group.name ? null : group.name,
-                    )
-                  }
-                  className="text-left px-8 py-2 text-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full flex justify-between items-center cursor-pointer"
-                  role="menuitem"
-                >
-                  {group.name}
-                  <svg
-                    className="w-5 h-5 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
+        <div
+          className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] z-50 rounded-lg shadow-xl bg-white ring-1 ring-black/5 overflow-hidden"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div className="py-1 max-h-[70vh] overflow-y-auto">
+            {categories.map((group) => {
+              const isExpanded = openSubMenu === group.name;
+              return (
+                <div key={group.name} className="border-b border-gray-100 last:border-b-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenSubMenu(isExpanded ? null : group.name)
+                    }
+                    className={`w-full flex justify-between items-center text-left px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-brand-blue transition-colors cursor-pointer ${
+                      isExpanded ? "bg-gray-50 text-brand-blue" : ""
+                    }`}
+                    role="menuitem"
+                    aria-expanded={isExpanded}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
+                    <span className="break-words pr-2">{group.name}</span>
+                    <ChevronDown
+                      className={`shrink-0 w-4 h-4 text-gray-400 transition-transform ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
                     />
-                  </svg>
-                </button>
-                {openSubMenu === group.name && (
-                  <div>
-                    {group.brochures.map((b) => (
-                      <a
-                        key={b.id}
-                        href={b.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        {b.title}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                  </button>
+                  {isExpanded && (
+                    <div className="bg-gray-50/50">
+                      {group.brochures.map((b) => (
+                        <a
+                          key={b.id}
+                          href={b.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block px-6 py-2 text-sm text-gray-600 hover:bg-white hover:text-brand-blue break-words leading-snug"
+                          role="menuitem"
+                        >
+                          {b.title}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

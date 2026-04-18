@@ -1,6 +1,6 @@
 import { supabase } from "@/db";
 import type { Testimonial } from "@/db/types";
-import { TestimonialRowActions } from "@/components/admin/testimonial-row-actions";
+import { TestimonialsTable } from "@/components/admin/testimonials-table";
 
 export const dynamic = "force-dynamic";
 
@@ -13,55 +13,32 @@ export default async function AdminTestimonials() {
   if (error) throw error;
   const rows: Testimonial[] = data ?? [];
 
-  if (rows.length === 0) {
-    return <p className="text-gray-600">No testimonials yet.</p>;
-  }
+  const pendingCount = rows.filter((r) => !r.approved).length;
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-      <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 text-left">
-          <tr>
-            <th className="px-4 py-2">Date</th>
-            <th className="px-4 py-2">Stars</th>
-            <th className="px-4 py-2">Name</th>
-            <th className="px-4 py-2">Message</th>
-            <th className="px-4 py-2">Status</th>
-            <th className="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} className="border-t border-gray-100">
-              <td className="px-4 py-2 whitespace-nowrap">
-                {new Date(r.created_at).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-2 whitespace-nowrap">
-                {"★".repeat(r.rating)}
-                {"☆".repeat(5 - r.rating)}
-              </td>
-              <td className="px-4 py-2 whitespace-nowrap">
-                {r.first_name} {r.last_name}
-              </td>
-              <td className="px-4 py-2 max-w-md truncate">{r.message}</td>
-              <td className="px-4 py-2">
-                {r.approved ? (
-                  <span className="inline-block rounded bg-green-100 text-green-800 px-2 py-0.5 text-xs">
-                    Approved
-                  </span>
-                ) : (
-                  <span className="inline-block rounded bg-yellow-100 text-yellow-800 px-2 py-0.5 text-xs">
-                    Pending
-                  </span>
-                )}
-              </td>
-              <td className="px-4 py-2">
-                <TestimonialRowActions id={r.id} approved={r.approved} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <header className="flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-blue mb-1">
+            Reviews
+          </p>
+          <h1 className="text-3xl font-bold text-brand-dark-gray">Testimonials</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {rows.length} total · {pendingCount} pending approval
+          </p>
+        </div>
+      </header>
+
+      {rows.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
+          <p className="text-gray-500 font-medium">No testimonials yet.</p>
+          <p className="text-sm text-gray-400 mt-1">
+            New customer reviews will show up here for approval.
+          </p>
+        </div>
+      ) : (
+        <TestimonialsTable rows={rows} />
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { fadeInUp, viewportConfig } from "@/lib/animations";
 import { AccordionPanel } from "./accordion-panel";
+import { SectionHeader } from "@/components/sections/section-header";
 
 const faqItems = [
   {
@@ -48,19 +49,21 @@ const faqItems = [
 
 export function FAQAccordion() {
   return (
-    <motion.div
-      className="mt-4"
-      variants={fadeInUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={viewportConfig}
-      style={{ overflow: "visible" }}
-    >
-      <div className="text-2xl sm:text-3xl text-center mb-2 font-bold text-brand-dark-gray">
-        F.A.Q
-      </div>
-      <div className="h-[2px] w-24 mx-auto bg-brand-gradient mb-6" />
-      <AccordionPanel items={faqItems} />
-    </motion.div>
+    <div>
+      <SectionHeader
+        eyebrow="Quick Answers"
+        title="Frequently Asked"
+        description="The questions we hear most from homeowners."
+      />
+      <motion.div
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportConfig}
+        style={{ overflow: "visible" }}
+      >
+        <AccordionPanel items={faqItems} />
+      </motion.div>
+    </div>
   );
 }

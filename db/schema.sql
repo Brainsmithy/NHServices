@@ -110,3 +110,75 @@ create table if not exists public.brochures (
 
 alter table public.gallery_images enable row level security;
 alter table public.brochures      enable row level security;
+
+-- Realtime — push approved-testimonial changes to the public site in real time.
+-- The public carousel subscribes via the anon key and refetches on any insert/update/delete.
+do $$
+declare
+  is_member boolean;
+begin
+  select exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'testimonials'
+  ) into is_member;
+  if not is_member then
+    alter publication supabase_realtime add table public.testimonials;
+  end if;
+end $$;
+
+-- Anon role can SELECT only approved testimonials. Required so Supabase Realtime
+-- delivers row-change events to anonymous browsers (Realtime gates on RLS).
+do $$ begin
+  create policy "anon read approved testimonials"
+    on public.testimonials for select
+    to anon
+    using (approved = true);
+exception when duplicate_object then null; end $$;
+
+-- Same realtime + anon-read setup for gallery_images and brochures so the public
+-- gallery grid and equipment dropdown update live when admins add/edit/remove items.
+do $$
+declare
+  is_member boolean;
+begin
+  select exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'gallery_images'
+  ) into is_member;
+  if not is_member then
+    alter publication supabase_realtime add table public.gallery_images;
+  end if;
+end $$;
+
+do $$
+declare
+  is_member boolean;
+begin
+  select exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'brochures'
+  ) into is_member;
+  if not is_member then
+    alter publication supabase_realtime add table public.brochures;
+  end if;
+end $$;
+
+do $$ begin
+  create policy "anon read gallery"
+    on public.gallery_images for select
+    to anon
+    using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy "anon read brochures"
+    on public.brochures for select
+    to anon
+    using (true);
+exception when duplicate_object then null; end $$;
