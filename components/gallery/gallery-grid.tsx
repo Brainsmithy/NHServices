@@ -70,7 +70,7 @@ export function GalleryGrid({ images }: { images: GalleryItem[] }) {
       {visibleImages < images.length && (
         <div className="text-center my-4">
           <Button
-            className="w-1/2 sm:w-1/4 text-white font-semibold h-12 shadow-lg text-lg bg-brand-gradient"
+            className="w-1/2 sm:w-1/4 text-white font-semibold h-12 rounded-lg shadow-lg text-lg bg-brand-gradient"
             onPress={loadMoreImages}
           >
             Load More
@@ -95,7 +95,7 @@ export function GalleryGrid({ images }: { images: GalleryItem[] }) {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button color="secondary" onPress={closeModal}>
+            <Button className="rounded-lg" color="secondary" onPress={closeModal}>
               Close
             </Button>
           </ModalFooter>

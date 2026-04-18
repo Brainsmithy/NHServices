@@ -11,27 +11,11 @@ import {
 import { ServiceAccordion } from "@/components/accordions/service-accordion";
 
 const brandLogos = [
-  {
-    src: "/images/logos/reme-halo-logo.png",
-    alt: "Reme Halo",
-    className: "",
-  },
-  { src: "/images/logos/Navien_Logo.png", alt: "Navien", className: "" },
-  {
-    src: "/images/logos/honeywell-logo.png",
-    alt: "Honeywell",
-    className: "",
-  },
-  {
-    src: "/images/logos/aprilaire-logo.png",
-    alt: "AprilAire",
-    className: "",
-  },
-  {
-    src: "/images/logos/hd-fujitsu-logo.png",
-    alt: "Fujitsu",
-    className: "h-16 sm:h-20 md:h-24 max-w-[180px]",
-  },
+  { src: "/images/logos/reme-halo-logo.png", alt: "Reme Halo" },
+  { src: "/images/logos/Navien_Logo.png", alt: "Navien" },
+  { src: "/images/logos/honeywell-logo.png", alt: "Honeywell" },
+  { src: "/images/logos/aprilaire-logo.png", alt: "AprilAire" },
+  { src: "/images/logos/hd-fujitsu-logo.png", alt: "Fujitsu" },
 ];
 
 export function ServicesSection() {
@@ -52,34 +36,35 @@ export function ServicesSection() {
         <div className="w-full lg:w-1/2">
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-10">
             <motion.div
-              className="flex items-center justify-center gap-4 mb-8"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 mb-10 text-center sm:text-left"
               variants={fadeInUp}
               initial="hidden"
               whileInView="visible"
               viewport={viewportConfig}
             >
-              <span className="text-lg sm:text-2xl font-bold">
-                Authorized Dealer of:
+              <span className="text-base sm:text-xl md:text-2xl font-bold leading-tight">
+                Authorized Dealer of
               </span>
-              <Image
-                src="/images/logos/ruud-logo.png"
-                alt="RUUD"
-                width={160}
-                height={64}
-                style={{ width: "auto" }}
-                className="h-14 sm:h-16 object-contain"
-              />
+              <div className="relative h-14 sm:h-16 w-32 sm:w-40 shrink-0">
+                <Image
+                  src="/images/logos/ruud-logo.png"
+                  alt="RUUD"
+                  fill
+                  sizes="(max-width: 640px) 128px, 160px"
+                  className="object-contain"
+                />
+              </div>
             </motion.div>
 
             <div className="text-center mb-8">
               <div className="text-xl sm:text-2xl font-bold mb-2">
-                Trusted Brands:
+                Trusted Brands
               </div>
-              <div className="h-[2px] w-24 mx-auto bg-brand-gradient" />
+              <div className="h-[2px] w-24 mx-auto bg-brand-gradient rounded-full" />
             </div>
 
             <motion.div
-              className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 place-items-center"
+              className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
@@ -88,20 +73,18 @@ export function ServicesSection() {
               {brandLogos.map((logo) => (
                 <motion.div
                   key={logo.alt}
-                  className="flex items-center justify-center bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-full"
+                  className="flex items-center justify-center bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200 hover:shadow-md hover:border-brand-blue/40 transition h-20 sm:h-24"
                   variants={staggerItem}
                 >
-                  <Image
-                    src={logo.src}
-                    alt={logo.alt}
-                    width={200}
-                    height={96}
-                    style={{ width: "auto" }}
-                    className={
-                      logo.className ||
-                      "h-12 sm:h-14 md:h-16 max-w-[160px] object-contain"
-                    }
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={logo.src}
+                      alt={logo.alt}
+                      fill
+                      sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 200px"
+                      className="object-contain p-1"
+                    />
+                  </div>
                 </motion.div>
               ))}
             </motion.div>

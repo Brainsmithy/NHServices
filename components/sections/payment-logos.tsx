@@ -12,23 +12,28 @@ const paymentLogos = [
 
 export function PaymentLogos() {
   return (
-    <div className="bg-gray-50 border-b border-gray-200 py-3 px-6 sm:px-10 md:px-16 lg:px-24">
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <span className="text-sm text-gray-600 font-medium mr-1">
-          We Accept:
+    <section className="bg-white py-6 px-4 sm:px-8 md:px-12 lg:px-16">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+        <span className="text-sm font-semibold tracking-wide uppercase text-brand-dark-gray shrink-0">
+          We Accept
         </span>
-        {paymentLogos.map((logo) => (
-          <Image
-            key={logo.alt}
-            src={logo.src}
-            alt={logo.alt}
-            width={60}
-            height={32}
-            style={{ width: "auto" }}
-            className="h-7 sm:h-8 object-contain"
-          />
-        ))}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          {paymentLogos.map((logo) => (
+            <div
+              key={logo.alt}
+              className="relative h-8 w-14 sm:w-16"
+            >
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                fill
+                sizes="64px"
+                className="object-contain"
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

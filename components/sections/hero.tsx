@@ -61,7 +61,7 @@ export function Hero() {
         />
 
         <motion.div
-          className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
+          className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4 sm:gap-6"
           variants={fadeInUp}
           initial="hidden"
           animate="visible"
@@ -69,18 +69,23 @@ export function Hero() {
         >
           <ContactFormModal
             buttonText="Get An Estimate!"
-            buttonClassName="h-12 px-6 text-white font-semibold text-md drop-shadow-lg bg-brand-gradient"
+            buttonClassName="h-12 px-6 rounded-lg text-white font-semibold text-md drop-shadow-lg bg-brand-gradient"
           />
 
-          <Button
-            as="a"
-            href="https://www.synchrony.com/mmc/M9229374400"
-            target="_blank"
-            rel="noreferrer"
-            className="h-10 sm:h-12 text-[#3B3D44] font-semibold text-sm sm:text-md drop-shadow-md bg-brand-yellow hover:bg-[#3B3D44] hover:text-brand-yellow active:bg-brand-yellow border-1 border-black hover:border-brand-yellow rounded-lg px-4"
-          >
-            Financing Available!
-          </Button>
+          <div className="flex flex-col items-center">
+            <Button
+              as="a"
+              href="https://www.synchrony.com/mmc/M9229374400"
+              target="_blank"
+              rel="noreferrer"
+              className="h-12 px-6 text-[#3B3D44] font-semibold text-sm sm:text-md drop-shadow-md bg-brand-yellow hover:bg-[#3B3D44] hover:text-brand-yellow active:bg-brand-yellow border-1 border-black hover:border-brand-yellow rounded-lg"
+            >
+              Financing Available!
+            </Button>
+            <span className="mt-1 text-xs text-brand-dark-gray/80">
+              by Synchrony
+            </span>
+          </div>
         </motion.div>
       </div>
     </section>

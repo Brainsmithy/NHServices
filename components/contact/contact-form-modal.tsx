@@ -91,7 +91,7 @@ export function ContactFormModal({ buttonText, buttonClassName }: Props) {
       <Button
         className={
           buttonClassName ??
-          "text-lg text-white font-semibold px-8 py-6 drop-shadow-lg bg-brand-gradient"
+          "text-lg text-white font-semibold px-8 py-6 rounded-lg drop-shadow-lg bg-brand-gradient"
         }
         onPress={onOpen}
       >
@@ -161,6 +161,7 @@ export function ContactFormModal({ buttonText, buttonClassName }: Props) {
           </ModalBody>
           <ModalFooter>
             <Button
+              className="rounded-lg"
               color="primary"
               onPress={handleSubmit}
               isLoading={status === "submitting"}
@@ -169,6 +170,7 @@ export function ContactFormModal({ buttonText, buttonClassName }: Props) {
               Send
             </Button>
             <Button
+              className="rounded-lg"
               color="secondary"
               variant="light"
               onPress={handleClose}

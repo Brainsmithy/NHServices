@@ -9,7 +9,6 @@ import { FAQAccordion } from "@/components/accordions/faq-accordion";
 export default function HomePage() {
   return (
     <main className="w-full">
-      <PaymentLogos />
       <Hero />
       <div className="section-divider" />
       <AboutUsSection />
@@ -24,6 +23,7 @@ export default function HomePage() {
         <FAQAccordion />
       </section>
       <div className="section-divider" />
+      <PaymentLogos />
     </main>
   );
 }
