@@ -51,13 +51,13 @@ export function GoogleReviewsBadge() {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -2 }}
-      className="group absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-2 sm:gap-3 rounded-full bg-white/95 backdrop-blur-sm pl-2 pr-3 sm:pl-3 sm:pr-4 py-1.5 sm:py-2 shadow-lg ring-1 ring-black/5 hover:shadow-xl hover:bg-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4]"
+      className="group absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2 sm:gap-3 rounded-full bg-black/90 backdrop-blur-sm pl-2 pr-3 sm:pl-3 sm:pr-4 py-1.5 sm:py-2 shadow-lg ring-1 ring-white/10 hover:shadow-xl hover:bg-black transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4]"
     >
       <GoogleG className="h-6 w-6 sm:h-7 sm:w-7 shrink-0" />
 
       <div className="flex flex-col leading-tight">
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] sm:text-xs font-semibold text-brand-dark-gray tracking-tight">
+          <span className="text-[11px] sm:text-xs font-semibold text-white tracking-tight">
             Reviews
           </span>
           <div className="flex items-center gap-[1px]">
@@ -66,7 +66,7 @@ export function GoogleReviewsBadge() {
             ))}
           </div>
         </div>
-        <span className="text-[10px] sm:text-[11px] text-[#4285F4] font-medium group-hover:underline">
+        <span className="text-[10px] sm:text-[11px] text-[#8AB4F8] font-medium group-hover:underline">
           Leave a Review →
         </span>
       </div>

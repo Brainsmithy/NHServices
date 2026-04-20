@@ -123,12 +123,7 @@ export function ServiceAreaSection() {
                 />
               </motion.div>
 
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-800 text-xs font-bold tracking-wide uppercase">
-                <span className="h-2 w-2 rounded-full bg-green-500" />
-                Licensed &amp; Insured · Colorado
-              </div>
-
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-brand-dark-gray mt-5 leading-tight">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-brand-dark-gray mt-6 leading-tight">
                 Fully Licensed &amp; Insured in the State of Colorado
               </h3>
               <p className="mt-3 text-sm text-gray-600">
