@@ -4,7 +4,27 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { fadeInUp, viewportConfig } from "@/lib/animations";
 
-const socialMediaLinks = [
+type SocialLink = {
+  name: string;
+  url: string;
+  icon: string | React.ReactNode;
+};
+
+function YouTubeTile() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="w-9 h-9 rounded-lg"
+    >
+      <rect width="36" height="36" rx="8" fill="#FF0000" />
+      <path d="M14.5 12.5 v11 l9 -5.5 z" fill="#ffffff" />
+    </svg>
+  );
+}
+
+const socialMediaLinks: SocialLink[] = [
   {
     name: "Facebook",
     url: "https://www.facebook.com/profile.php?id=100064849591688",
@@ -19,6 +39,11 @@ const socialMediaLinks = [
     name: "Instagram",
     url: "https://www.instagram.com/nh_services_hvac",
     icon: "/images/logos/instagram-icon.png",
+  },
+  {
+    name: "YouTube",
+    url: "https://www.youtube.com/@NHServicesLLC",
+    icon: <YouTubeTile />,
   },
 ];
 
@@ -168,13 +193,17 @@ export function Footer() {
                   aria-label={link.name}
                   className="rounded-lg overflow-hidden hover:scale-110 transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
                 >
-                  <Image
-                    src={link.icon}
-                    alt={link.name}
-                    width={36}
-                    height={36}
-                    className="w-9 h-9 rounded-lg"
-                  />
+                  {typeof link.icon === "string" ? (
+                    <Image
+                      src={link.icon}
+                      alt={link.name}
+                      width={36}
+                      height={36}
+                      className="w-9 h-9 rounded-lg"
+                    />
+                  ) : (
+                    link.icon
+                  )}
                 </a>
               ))}
             </div>
