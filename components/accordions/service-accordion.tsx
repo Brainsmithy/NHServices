@@ -14,7 +14,6 @@ const serviceItems = [
         <li>Tankless Water Heater Installation</li>
         <li>Ductless Mini Split Installation</li>
         <li>Heat Pump Installation</li>
-        <li>Ductwork Installation and Repair</li>
         <li>Humidifier Installation</li>
         <li>Air Purifier Installation</li>
         <li>Smart Thermostat Installation</li>
@@ -26,7 +25,6 @@ const serviceItems = [
     content: (
       <ul className="list-disc ml-4 text-brand-dark-gray">
         <li>Maintenance for all Brands</li>
-        <li>Ductwork Cleaning</li>
       </ul>
     ),
   },

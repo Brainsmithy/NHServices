@@ -29,14 +29,6 @@ const faqItems = [
     ),
   },
   {
-    title: "Should we have the air ducts cleaned?",
-    content: (
-      <span className="text-brand-dark-gray font-semibold">
-        Yes, every 5-8 years.
-      </span>
-    ),
-  },
-  {
     title: "Are digital thermostats more energy efficient?",
     content: (
       <span className="text-brand-dark-gray font-semibold">

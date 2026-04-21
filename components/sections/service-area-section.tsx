@@ -6,34 +6,14 @@ import {
   fadeInLeft,
   fadeInRight,
   scaleIn,
-  staggerContainer,
-  staggerItem,
   viewportConfig,
 } from "@/lib/animations";
 import { SectionHeader } from "./section-header";
 
-const cities = [
-  "Longmont",
-  "Erie",
-  "Broomfield",
-  "Westminster",
-  "Thornton",
-  "Northglenn",
-  "Federal Heights",
-  "Commerce City",
-  "Denver",
-  "Aurora",
-  "Centennial",
-  "Parker",
-  "Lone Tree",
-  "Highlands Ranch",
-  "Castle Rock",
-];
-
 function PinIcon() {
   return (
     <svg
-      className="h-3.5 w-3.5 text-brand-blue shrink-0"
+      className="h-5 w-5 text-brand-blue shrink-0"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden="true"
@@ -76,24 +56,13 @@ export function ServiceAreaSection() {
                     className="max-h-[22rem] mx-auto rounded-xl object-contain"
                   />
                 </div>
-                <motion.ul
-                  className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:text-base"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={viewportConfig}
-                >
-                  {cities.map((city) => (
-                    <motion.li
-                      key={city}
-                      variants={staggerItem}
-                      className="flex items-center gap-2 text-brand-dark-gray"
-                    >
-                      <PinIcon />
-                      <span>{city}</span>
-                    </motion.li>
-                  ))}
-                </motion.ul>
+                <div className="flex items-start gap-3 text-brand-dark-gray text-base sm:text-lg leading-snug">
+                  <PinIcon />
+                  <p>
+                    <span className="font-semibold">Denver Metro</span> &amp;
+                    surrounding cities — from Longmont down to Castle Rock.
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
