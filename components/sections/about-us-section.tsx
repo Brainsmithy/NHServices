@@ -8,7 +8,7 @@ import { SectionHeader } from "./section-header";
 const stats = [
   { label: "Years in business", value: "29+" },
   { label: "Family-run", value: "100%" },
-  { label: "Denver metro served", value: "15 cities" },
+  { label: "Service area", value: "Denver Metro + Surrounding" },
 ];
 
 export function AboutUsSection() {
