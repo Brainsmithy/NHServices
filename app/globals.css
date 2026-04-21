@@ -1,0 +1,47 @@
+@import "tailwindcss";
+@source "../node_modules/@heroui";
+
+@theme {
+  --color-brand-blue: #54a0d7;
+  --color-brand-orange: #e75909;
+  --color-brand-dark-gray: #5A5858;
+  --color-brand-light-gray: #D9D9D9;
+  --color-brand-yellow: #FBC600;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #e75909, #54a0d7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
+}
+
+.bg-gradient {
+  background: linear-gradient(to right, #e75909, #54a0d7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
+}
+
+.bg-brand-gradient {
+  background-image: linear-gradient(to right, #54a0d7, #e75909);
+}
+
+@layer components {
+  .section-divider {
+    @apply h-2 w-full;
+    background-image: linear-gradient(to right, #54a0d7, #e75909);
+  }
+}
